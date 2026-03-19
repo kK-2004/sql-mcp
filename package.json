@@ -1,10 +1,19 @@
 {
-  "name": "mysql-mcp-local",
+  "name": "@kk-2004/sql-mcp-server",
   "version": "0.1.0",
-  "private": true,
   "type": "module",
-  "description": "Local stdio MCP server for controlled MySQL access",
+  "description": "SQL MCP Server for MySQL and SQLite - Claude Code integration",
+  "license": "MIT",
   "main": "server.js",
+  "bin": {
+    "sql-mcp-server": "./server.js"
+  },
+  "files": [
+    "server.js",
+    "src/",
+    "README.md",
+    "LICENSE"
+  ],
   "scripts": {
     "start": "node server.js"
   },
