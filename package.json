@@ -1,6 +1,6 @@
 {
   "name": "@kk-2004/sql-mcp-server",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "type": "module",
   "description": "SQL MCP Server for MySQL and SQLite - Claude Code integration",
   "license": "MIT",

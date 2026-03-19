@@ -13,6 +13,8 @@
 ## 目录
 
 - [亮点](#highlights)
+- [使用场景](#scenarios)
+- [效果预览](#preview)
 - [工作原理](#workflows)
 - [快速开始](#usage)
 - [Claude Desktop / Claude Code 集成](#integration)
@@ -32,6 +34,58 @@
 - **SSH 隧道** — 内置 MySQL + SSH 隧道支持，轻松连接远程数据库
 - **权限控制** — 支持表白名单与操作白名单，双重防护
 - **开箱即用** — 兼容 Claude Desktop 配置格式
+
+---
+
+<a id="scenarios"></a>
+## 使用场景
+
+### 1. 本地开发，批量插入测试数据
+
+让 LLM 通过 `db_insert` 往开发库或 SQLite 文件里批量写入测试数据，快速准备联调环境、演示数据或回归测试样本。
+
+### 2. 联调时快速理解数据库结构
+
+让 LLM 先执行 `db_connect` 和 `db_describe_schema`，快速了解有哪些表、字段类型和约束，减少手动翻表结构的时间。
+
+### 3. 排查脏数据或线上问题
+
+在只开放 `connect,schema,query` 的前提下，让 LLM 帮你查询异常记录、比对状态字段、定位重复数据或缺失数据。
+
+### 4. 做项目统计、报表和运营分析
+
+适合统计提交人数、重复提交、逾期提交、订单汇总、用户活跃度等场景，让 LLM 把查询结果整理成可读报告。
+
+### 5. 通过 SSH 隧道安全访问远程 MySQL
+
+当数据库只能从堡垒机或跳板机访问时，可以结合 SSH 隧道能力，把远程数据库以受控方式接给 Claude 使用。
+
+### 6. 分权限开放数据库能力
+
+你可以按环境控制能力范围：开发环境开放 `insert/delete`，生产环境只开放 `connect/schema/query`，降低误操作风险。
+
+---
+
+<a id="preview"></a>
+## 效果预览
+
+下面两张图分别展示了典型使用流程和最终输出效果：
+
+### 工具调用过程
+
+LLM 先按 MCP 协议连接数据库、识别表结构，再分步发起查询。
+
+<p align="center">
+  <img src="./.assets/01.png" alt="MCP tool calls" width="900" />
+</p>
+
+### 统计结果输出
+
+查询完成后，LLM 会基于工具返回结果生成结构化报告。
+
+<p align="center">
+  <img src="./.assets/02.JPG" alt="Generated report" width="420" />
+</p>
 
 ---
 
@@ -197,6 +251,9 @@ node ./node_modules/@kk-2004/sql-mcp-server/server.js --mode=sqlite --db-path=/p
 
 以下配置可直接放入 Claude Desktop 配置文件。
 
+> macOS / Linux 可以直接使用 `npx`。
+> Windows 原生环境建议使用 `cmd /c npx ...`，避免 Claude 启动 MCP 服务时找不到 `npx`。
+
 ### SQLite
 
 ```json
@@ -209,6 +266,27 @@ node ./node_modules/@kk-2004/sql-mcp-server/server.js --mode=sqlite --db-path=/p
         "@kk-2004/sql-mcp-server",
         "--mode=sqlite",
         "--db-path=/path/to/database.db",
+        "--tables=*"
+      ]
+    }
+  }
+}
+```
+
+### Windows（`npx` 启动示例）
+
+```json
+{
+  "mcpServers": {
+    "sql-mcp": {
+      "command": "cmd",
+      "args": [
+        "/c",
+        "npx",
+        "-y",
+        "@kk-2004/sql-mcp-server",
+        "--mode=sqlite",
+        "--db-path=C:\\path\\to\\database.db",
         "--tables=*"
       ]
     }
@@ -314,7 +392,7 @@ node ./node_modules/@kk-2004/sql-mcp-server/server.js --mode=sqlite --db-path=/p
     "sql-mcp": {
       "command": "node",
       "args": [
-        "/Users/you/project/sql_mcp/server.js",
+        "/Users/you/project/node_modules/@kk-2004/sql-mcp-server/server.js",
         "--mode=mysql",
         "--mysql-host=127.0.0.1",
         "--mysql-user=root",
