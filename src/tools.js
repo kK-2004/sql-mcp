@@ -3,8 +3,8 @@ export function toolDefinitions(config) {
 
   if (config.allowedMethods.has("connect")) {
     tools.push({
-      name: "mysql_connect",
-      description: "Connect to MySQL and verify credentials/database access.",
+      name: "db_connect",
+      description: "Connect to database and verify credentials/database access.",
       inputSchema: {
         type: "object",
         properties: {}
@@ -14,7 +14,7 @@ export function toolDefinitions(config) {
 
   if (config.allowedMethods.has("schema")) {
     tools.push({
-      name: "mysql_describe_schema",
+      name: "db_describe_schema",
       description: "Show table schema in current database (allowed tables only).",
       inputSchema: {
         type: "object",
@@ -30,7 +30,7 @@ export function toolDefinitions(config) {
 
   if (config.allowedMethods.has("query")) {
     tools.push({
-      name: "mysql_query",
+      name: "db_query",
       description: "Query rows from an allowed table.",
       inputSchema: {
         type: "object",
@@ -61,7 +61,7 @@ export function toolDefinitions(config) {
 
   if (config.allowedMethods.has("insert")) {
     tools.push({
-      name: "mysql_insert",
+      name: "db_insert",
       description: "Insert one row into an allowed table.",
       inputSchema: {
         type: "object",
@@ -79,7 +79,7 @@ export function toolDefinitions(config) {
 
   if (config.allowedMethods.has("delete")) {
     tools.push({
-      name: "mysql_delete",
+      name: "db_delete",
       description: "Delete rows from an allowed table (where required by default).",
       inputSchema: {
         type: "object",

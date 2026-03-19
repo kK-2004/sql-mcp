@@ -1,6 +1,8 @@
 import process from "node:process";
 import { SUPPORTED_METHODS } from "./constants.js";
 
+const SUPPORTED_MODES = new Set(["mysql", "sqlite"]);
+
 function parseCliArgs(argv) {
   const args = {};
   for (const part of argv) {
@@ -70,11 +72,59 @@ export function parseConfig() {
     return cli[cliKey] ?? process.env[envKey] ?? fallback;
   };
 
+  // Parse mode (default: mysql)
+  const mode = get("mode", "DB_MODE", "mysql").toLowerCase();
+  if (!SUPPORTED_MODES.has(mode)) {
+    throw new Error(`Unsupported mode '${mode}'. Supported modes: ${Array.from(SUPPORTED_MODES).join(", ")}`);
+  }
+
   const allowedTables = splitCsv(get("tables", "ALLOWED_TABLES"));
   const allowedMethods = splitCsv(
     get("methods", "ALLOWED_METHODS", "connect,schema,query,insert,delete")
   ).map((m) => m.toLowerCase());
 
+  const defaultLimit = Number(get("default-limit", "DEFAULT_LIMIT", "100"));
+  const maxLimit = Number(get("max-limit", "MAX_LIMIT", "1000"));
+  const allowEmptyDelete = parseBoolean(get("allow-empty-delete", "ALLOW_EMPTY_DELETE", "false"), false);
+
+  if (!allowedTables.length) {
+    throw new Error("ALLOWED_TABLES is required, e.g. users,orders or *");
+  }
+  if (!allowedMethods.length) {
+    throw new Error("ALLOWED_METHODS must include at least one supported method");
+  }
+  for (const method of allowedMethods) {
+    if (!SUPPORTED_METHODS.has(method)) {
+      throw new Error(`Unsupported method '${method}'. Supported: connect,schema,query,insert,delete`);
+    }
+  }
+  if (allowedMethods.includes("schema") && !allowedMethods.includes("connect")) {
+    throw new Error("If schema is enabled, connect must also be enabled");
+  }
+  if (Number.isNaN(defaultLimit) || Number.isNaN(maxLimit)) {
+    throw new Error("DEFAULT_LIMIT and MAX_LIMIT must be numbers");
+  }
+
+  // SQLite-specific config
+  if (mode === "sqlite") {
+    const dbPath = get("db-path", "SQLITE_DB_PATH");
+    if (!dbPath) {
+      throw new Error("SQLITE_DB_PATH (or --db-path) is required for SQLite mode");
+    }
+
+    return {
+      mode: "sqlite",
+      dbPath,
+      allowedTables: new Set(allowedTables),
+      allowedMethods: new Set(allowedMethods),
+      defaultLimit,
+      maxLimit,
+      allowEmptyDelete,
+      ssh: { enabled: false }
+    };
+  }
+
+  // MySQL-specific config
   const mysqlUrl = get("mysql-url", "MYSQL_URL");
   const host = get("mysql-host", "MYSQL_HOST");
   const port = Number(get("mysql-port", "MYSQL_PORT", "3306"));
@@ -98,24 +148,6 @@ export function parseConfig() {
     get("ssh-dst-port", "SSH_DST_PORT", String(mysqlUrlInfo?.port ?? port))
   );
 
-  const defaultLimit = Number(get("default-limit", "DEFAULT_LIMIT", "100"));
-  const maxLimit = Number(get("max-limit", "MAX_LIMIT", "1000"));
-  const allowEmptyDelete = parseBoolean(get("allow-empty-delete", "ALLOW_EMPTY_DELETE", "false"), false);
-
-  if (!allowedTables.length) {
-    throw new Error("ALLOWED_TABLES is required, e.g. users,orders or *");
-  }
-  if (!allowedMethods.length) {
-    throw new Error("ALLOWED_METHODS must include at least one supported method");
-  }
-  for (const method of allowedMethods) {
-    if (!SUPPORTED_METHODS.has(method)) {
-      throw new Error(`Unsupported method '${method}'. Supported: connect,schema,query,insert,delete`);
-    }
-  }
-  if (allowedMethods.includes("schema") && !allowedMethods.includes("connect")) {
-    throw new Error("If schema is enabled, connect must also be enabled");
-  }
   if (!mysqlUrl && (!host || !user || !database)) {
     throw new Error("Provide MYSQL_URL or MYSQL_HOST + MYSQL_USER + MYSQL_DATABASE");
   }
@@ -127,9 +159,6 @@ export function parseConfig() {
   }
   if (!mysqlUrlInfo) {
     assertPort(port, "MYSQL_PORT");
-  }
-  if (Number.isNaN(defaultLimit) || Number.isNaN(maxLimit)) {
-    throw new Error("DEFAULT_LIMIT and MAX_LIMIT must be numbers");
   }
   if (sshEnabled) {
     if (!sshHost) throw new Error("SSH_HOST is required when SSH_ENABLED=true");
@@ -146,6 +175,7 @@ export function parseConfig() {
   }
 
   return {
+    mode: "mysql",
     mysqlUrl,
     host,
     port,
