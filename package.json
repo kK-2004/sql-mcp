@@ -4,6 +4,14 @@
   "type": "module",
   "description": "SQL MCP Server for MySQL and SQLite - Claude Code integration",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/kK-2004/sql-mcp.git"
+  },
+  "homepage": "https://github.com/kK-2004/sql-mcp#readme",
+  "bugs": {
+    "url": "https://github.com/kK-2004/sql-mcp/issues"
+  },
   "main": "server.js",
   "bin": {
     "sql-mcp-server": "./server.js"
@@ -11,6 +19,7 @@
   "files": [
     "server.js",
     "src/",
+    ".assets/",
     "README.md",
     "LICENSE"
   ],

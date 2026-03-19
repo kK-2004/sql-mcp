@@ -557,8 +557,8 @@ node ./node_modules/@kk-2004/sql-mcp-server/server.js --mode=sqlite --db-path=/p
 ## 🧑‍💻 本地开发
 
 ```bash
-git clone <repo-url>
-cd sql_mcp
+git clone https://github.com/kK-2004/sql-mcp.git
+cd sql-mcp
 npm install
 node server.js --mode=sqlite --db-path=/path/to/database.db --tables='*'
 ```
