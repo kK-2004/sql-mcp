@@ -18,6 +18,9 @@ yarn-error.log*
 .pnpm-store/
 .cache/
 
+# Worktrees
+.worktrees/
+
 # OS / editor
 .DS_Store
 Thumbs.db
