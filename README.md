@@ -3,9 +3,9 @@
 > 面向 Claude Desktop / Claude Code 的 MCP 数据库服务，支持 MySQL 和 SQLite，内置表白名单、操作限制和 SSH 隧道。
 
 <p align="center">
-  <img alt="npm" src="https://img.shields.io/npm/v/@kk-2004/sql-mcp-server?style=flat-square&color=0ea5e9">
-  <img alt="license" src="https://img.shields.io/npm/l/@kk-2004/sql-mcp-server?style=flat-square&color=22c55e">
-  <img alt="node" src="https://img.shields.io/node/v/@kk-2004/sql-mcp-server?style=flat-square&color=a855f7">
+  <img alt="npm" src="https://img.shields.io/npm/v/%40kk-2004%2Fsql-mcp-server?style=flat-square&color=0ea5e9">
+  <img alt="license" src="https://img.shields.io/npm/l/%40kk-2004%2Fsql-mcp-server?style=flat-square&color=22c55e">
+  <img alt="node" src="https://img.shields.io/node/v/%40kk-2004%2Fsql-mcp-server?style=flat-square&color=a855f7">
 </p>
 
 ---
